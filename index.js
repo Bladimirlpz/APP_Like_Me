@@ -1,6 +1,6 @@
 const {obtenerCard, agregarCard, deleteCard, modificarCard} = require('./consultas');
 const express = require("express")
-const cors = require("cors")
+const cors = require("cors");
 const app = express()
 
 app.listen(3000, console.log("Servidor 3000 activo"))
@@ -13,10 +13,20 @@ app.get("/posts", async (req, res) => {
 })
 
 app.post("/posts", async (req, res) => {
-  const { titulo, url, descripcion } = req.body
-  const postCard = await agregarCard(titulo, url, descripcion)
-  res.json(postCard)
-});
+  try {
+    const { titulo, url, descripcion } = req.body
+    const postCard = await agregarCard(titulo, url, descripcion)
+    if (titulo === "" || url === "" || descripcion === "" ){
+      throw{
+        code:500,
+        message:"Campos vacios"
+      }
+    }
+    res.json(postCard)    
+  } catch (error) {
+    res.status(error.code).json(error.message)
+  }
+    })
 
 app.put("/posts/like/:id", async (req, res) => {
   const { id } = req.params
